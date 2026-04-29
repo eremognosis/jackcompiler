@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "vmwriter.h"
+#include "common.h"
 
 
 static const char* get_segment_name(Segment seg) {
@@ -39,56 +40,58 @@ static const char* getcommandname(Command cmd)
 
 void vm_write_push(FILE* out, Segment seg, int index)
 {
-    if (!get_segment_name(seg))
+    const char *segment = get_segment_name(seg);
+    if (!segment)
     {
-        fprintf(stderr, "ERRVM001: INVALID OPERATION");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_INVALID_SEGMENT, "vmwriter", "vm_write_push received invalid segment");
         return;
     }
     if (!out)
     {
-        fprintf(stderr, "ERRVM002: NO OUTPUT FILE");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_OUTPUT_NULL, "vmwriter", "vm_write_push output stream is NULL");
         return;
     }
 
-    fprintf(out, "push %s %d\n", get_segment_name(seg), index);
+    fprintf(out, "push %s %d\n", segment, index);
 
 
 }
 
 void vm_write_pop(FILE* out, Segment seg, int index)
 {
-    if (!get_segment_name(seg))
+    const char *segment = get_segment_name(seg);
+    if (!segment)
     {
-        fprintf(stderr, "ERRVM001: INVALID OPERATION");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_INVALID_SEGMENT, "vmwriter", "vm_write_pop received invalid segment");
         return;
     }
     if (!out)
     {
-        fprintf(stderr, "ERRVM002: NO OUTPUT FILE");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_OUTPUT_NULL, "vmwriter", "vm_write_pop output stream is NULL");
         return;
     }
 
     if (seg==SEG_CONST)
     {
-        fprintf(stderr, "ERRVM003: POP FROM CONSTANT MAKES NO SENSE");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_POP_CONST, "vmwriter", "vm_write_pop cannot pop to constant segment");
         return;
     }
 
-    fprintf(out, "pop %s %d\n", get_segment_name(seg), index);
+    fprintf(out, "pop %s %d\n", segment, index);
 }
 
 void vm_write_arithmetic(FILE* out, Command cmd)
 {
     if (!out)
     {
-        fprintf(stderr, "ERRVM002: NO OUTPUT FILE");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_OUTPUT_NULL, "vmwriter", "vm_write_arithmetic output stream is NULL");
         return;
     }
 
     const char *command = getcommandname(cmd);
     if (!command)
     {
-        fprintf(stderr, "ERRVM003: INVALID COMMAND");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_INVALID_COMMAND, "vmwriter", "vm_write_arithmetic received invalid command");
         return;
     }
     fprintf(out, "%s\n", command);
@@ -98,7 +101,12 @@ void vm_write_label(FILE* out, const char* label)
 {
     if (!out)
     {
-        fprintf(stderr, "ERRVM002: NO OUTPUT FILE");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_OUTPUT_NULL, "vmwriter", "vm_write_label output stream is NULL");
+        return;
+    }
+    if (!label)
+    {
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_INVALID_LABEL, "vmwriter", "vm_write_label label is NULL");
         return;
     }
     fprintf(out, "label %s\n", label);
@@ -108,7 +116,12 @@ void vm_write_goto(FILE* out, const char* label)
 {
     if (!out)
     {
-        fprintf(stderr, "ERRVM002: NO OUTPUT FILE");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_OUTPUT_NULL, "vmwriter", "vm_write_goto output stream is NULL");
+        return;
+    }
+    if (!label)
+    {
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_INVALID_LABEL, "vmwriter", "vm_write_goto label is NULL");
         return;
     }
     fprintf(out, "goto %s\n", label);
@@ -118,7 +131,12 @@ void vm_write_if(FILE* out, const char* label)
 {
     if (!out)
     {
-        fprintf(stderr, "ERRVM002: NO OUTPUT FILE");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_OUTPUT_NULL, "vmwriter", "vm_write_if output stream is NULL");
+        return;
+    }
+    if (!label)
+    {
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_INVALID_LABEL, "vmwriter", "vm_write_if label is NULL");
         return;
     }
     fprintf(out, "if-goto %s\n", label);
@@ -128,7 +146,12 @@ void vm_write_call(FILE* out, const char* name, int n_args)
 {
     if (!out)
     {
-        fprintf(stderr, "ERRVM002: NO OUTPUT FILE");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_OUTPUT_NULL, "vmwriter", "vm_write_call output stream is NULL");
+        return;
+    }
+    if (!name)
+    {
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_INVALID_FUNCTION, "vmwriter", "vm_write_call function name is NULL");
         return;
     }
     fprintf(out, "call %s %d\n", name, n_args);
@@ -138,7 +161,12 @@ void vm_write_function(FILE* out, const char* name, int n_locals)
 {
     if (!out)
     {
-        fprintf(stderr, "ERRVM002: NO OUTPUT FILE");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_OUTPUT_NULL, "vmwriter", "vm_write_function output stream is NULL");
+        return;
+    }
+    if (!name)
+    {
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_INVALID_FUNCTION, "vmwriter", "vm_write_function function name is NULL");
         return;
     }
     fprintf(out, "function %s %d\n", name, n_locals);
@@ -148,7 +176,7 @@ void vm_write_return(FILE* out)
 {
     if (!out)
     {
-        fprintf(stderr, "ERRVM002: NO OUTPUT FILE");
+        CCOMP_LOG_ERROR(CCOMP_ERR_VMW_OUTPUT_NULL, "vmwriter", "vm_write_return output stream is NULL");
         return;
     }
     fprintf(out, "return\n");

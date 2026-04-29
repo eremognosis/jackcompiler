@@ -29,9 +29,9 @@ typedef  struct
  * The APIs
  * =========================================================================================
  */
-typedef struct SymbolTable SymbolTable;
+typedef struct SymbolTable SymbolTable; ///i think linked list will work
 
-SymbolTable *new_SymbolTable();
+SymbolTable *new_SymbolTable(void);
 void symtab_destroy(SymbolTable *st);
 void symtab_start(SymbolTable *st);
 void symtab_define(SymbolTable *st, const char *name, const char *type, VarKind_t kind);
