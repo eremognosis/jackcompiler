@@ -1,13 +1,20 @@
-cmake_minimum_required(VERSION 4.2)
-project(CComp C)
+cmake_minimum_required(VERSION 3.10)
+
+project(JackCompiler C)
 
 set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
-add_executable(CComp main.c
-        include/common.h
-        include/tokenizer.h
-        include/symtab.h
-        include/vmwriter.h
-        include/compile.h
-        src/tokenizer.c
-        src/symtab.c)
+if(MSVC)
+    add_compile_options(/W4)
+else()
+    add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+endif()
+
+include_directories(include)
+
+file(GLOB SOURCES "src/*.c")
+
+add_executable(jack main.c ${SOURCES})
+
+enable_testing()
