@@ -55,8 +55,8 @@ void symtab_start(SymbolTable *st) {
     }
     free_list(st->sub_scope);
     st->sub_scope = NULL;
-    st->counts[K_ARG] = 0;
-    st->counts[K_VAR] = 0;
+    st->counts[VK_ARG] = 0;
+    st->counts[VK_VAR] = 0;
 }
 
 void symtab_define(SymbolTable *st, const char *name, const char *type, VarKind_t kind) {
@@ -64,7 +64,7 @@ void symtab_define(SymbolTable *st, const char *name, const char *type, VarKind_
         CCOMP_LOG_ERROR(CCOMP_ERR_SYMTAB_NULL_TABLE, "symtab", "symtab_define called with NULL table");
         return;
     }
-    if (!name || !type || kind == K_NONE) {
+    if (!name || !type || kind == VK_NONE) {
         CCOMP_LOG_ERROR(CCOMP_ERR_SYMTAB_INVALID_INPUT, "symtab", "symtab_define got invalid input");
         return;
     }
@@ -83,7 +83,7 @@ void symtab_define(SymbolTable *st, const char *name, const char *type, VarKind_
     new_node->data.kind = kind;
     new_node->data.index = st->counts[kind]++;
 
-    if (kind == K_STATIC || kind == K_FIELD) {
+    if (kind == VK_STATIC || kind == VK_FIELD) {
         new_node->next = st->class_scope;
         st->class_scope = new_node;
     } else {
@@ -93,7 +93,7 @@ void symtab_define(SymbolTable *st, const char *name, const char *type, VarKind_
 }
 
 int symtab_var_count(SymbolTable *st, VarKind_t kind) {
-    return (st && kind != K_NONE) ? st->counts[kind] : 0;
+    return (st && kind != VK_NONE) ? st->counts[kind] : 0;
 }
 
 static Symbol* find_symbol(SymbolTable *st, const char *name) {
@@ -115,7 +115,7 @@ static Symbol* find_symbol(SymbolTable *st, const char *name) {
 
 VarKind_t symtab_var_kind(SymbolTable *st, const char *name) {
     Symbol *s = find_symbol(st, name);
-    return s ? s->kind : K_NONE;
+    return s ? s->kind : VK_NONE;
 }
 
 char* symtab_tyoe(SymbolTable *st, const char *name) {

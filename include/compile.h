@@ -5,8 +5,8 @@
 #ifndef CCOMP_COMPILE_H
 #define CCOMP_COMPILE_H
 
-#include "tokenizer.h";
-#include "symtab.h";
+#include "tokenizer.h"
+#include "symtab.h"
 
 void compile_class(Tokenizer *t, SymbolTable *st, FILE *out);
 

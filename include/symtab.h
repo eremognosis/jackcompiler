@@ -12,7 +12,7 @@
  */
 typedef enum
 {
-    K_STATIC, K_FIELD, K_ARG, K_VAR, K_NONE
+    VK_STATIC, VK_FIELD, VK_ARG, VK_VAR, VK_NONE
 } VarKind_t;
 
 typedef  struct
