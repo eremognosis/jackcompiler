@@ -34,7 +34,8 @@ typedef enum
     K_LET, K_DO, K_IF, K_ELSE, K_WHILE,
     K_RETURN,
     K_TRUE, K_FALSE, K_NULL,
-    K_THIS, K_THAT
+    K_THIS, K_THAT,
+    K_NONE
 }KwdType;
 
 ///=======================================================================================///
@@ -68,7 +69,7 @@ void tokenizer_next(Tokenizer *t);
 /// getters
 
 TokenType tokenizer_get_type(Tokenizer *t);
-KwdType *tokenizer_get_keyword(Tokenizer *t);
+KwdType tokenizer_get_keyword(Tokenizer *t);
 char* tokenizer_identifier(Tokenizer *t);
 int tokenizer_int(Tokenizer *t);
 char* tokenizer_strc(Tokenizer *t);

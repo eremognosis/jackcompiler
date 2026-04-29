@@ -17,7 +17,7 @@
 #define CCOMP_ERR_VMW_INVALID_COMMAND "CC-VMW-004"
 #define CCOMP_ERR_VMW_INVALID_LABEL "CC-VMW-005"
 #define CCOMP_ERR_VMW_INVALID_FUNCTION "CC-VMW-006"
-
+#define CCOMP_ERR_NO_FILES "CC-TKN-001"
 void ccomp_log_errorf(
     const char *code,
     const char *component,
