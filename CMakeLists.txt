@@ -13,7 +13,7 @@ endif()
 
 include_directories(include)
 
-file(GLOB SOURCES "src/*.c")
+file(GLOB SOURCES CONFIGURE_DEPENDS "src/*.c")
 
 add_executable(jack main.c ${SOURCES})
 

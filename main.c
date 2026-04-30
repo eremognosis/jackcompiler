@@ -1,5 +1,6 @@
 #include "compile.h"
 #include "common.h"
+#include "syntax_xml.h"
 #include "symtab.h"
 
 #include <dirent.h>
@@ -28,16 +29,36 @@ static int make_vm_path(const char *in_path, char *out_path, size_t out_len) {
     return 0;
 }
 
+static int make_xml_path(const char *in_path, char *out_path, size_t out_len) {
+    size_t n = strlen(in_path);
+    if (n + 1 > out_len) {
+        return 0;
+    }
+    strncpy(out_path, in_path, out_len - 1);
+    out_path[out_len - 1] = '\0';
+    if (n >= 5 && strcmp(out_path + n - 5, ".jack") == 0) {
+        strcpy(out_path + n - 5, ".xml");
+        return 1;
+    }
+    return 0;
+}
+
 static int compile_one(const char *in_path) {
-    char out_path[PATH_MAX];
+    char vm_path[PATH_MAX];
+    char xml_path[PATH_MAX];
     FILE *in = NULL;
-    FILE *out = NULL;
+    FILE *vm_out = NULL;
+    FILE *xml_out = NULL;
     Tokenizer t;
     SymbolTable *st = NULL;
     int ok = 0;
 
-    if (!make_vm_path(in_path, out_path, sizeof(out_path))) {
+    if (!make_vm_path(in_path, vm_path, sizeof(vm_path))) {
         CCOMP_LOG_ERROR("CC-MAIN-001", "main", "cannot derive .vm output path");
+        return 0;
+    }
+    if (!make_xml_path(in_path, xml_path, sizeof(xml_path))) {
+        CCOMP_LOG_ERROR("CC-MAIN-008", "main", "cannot derive .xml output path");
         return 0;
     }
 
@@ -47,26 +68,40 @@ static int compile_one(const char *in_path) {
         return 0;
     }
 
-    out = fopen(out_path, "w");
-    if (!out) {
-        ccomp_log_errorf("CC-MAIN-003", "main", __FILE__, __LINE__, __func__, "failed to open output '%s'", out_path);
+    vm_out = fopen(vm_path, "w");
+    if (!vm_out) {
+        ccomp_log_errorf("CC-MAIN-003", "main", __FILE__, __LINE__, __func__, "failed to open output '%s'", vm_path);
         fclose(in);
+        return 0;
+    }
+
+    xml_out = fopen(xml_path, "w");
+    if (!xml_out) {
+        ccomp_log_errorf("CC-MAIN-009", "main", __FILE__, __LINE__, __func__, "failed to open output '%s'", xml_path);
+        fclose(in);
+        fclose(vm_out);
         return 0;
     }
 
     st = new_SymbolTable();
     if (!st) {
         fclose(in);
-        fclose(out);
+        fclose(vm_out);
+        fclose(xml_out);
         return 0;
     }
 
     tokenizer_init(&t, in);
-    compile_class(&t, st, out);
-    ok = 1;
+    compile_class(&t, st, vm_out);
+
+    rewind(in);
+    if (write_syntax_tree_xml(in, xml_out)) {
+        ok = 1;
+    }
 
     symtab_destroy(st);
-    fclose(out);
+    fclose(xml_out);
+    fclose(vm_out);
     fclose(in);
     return ok;
 }

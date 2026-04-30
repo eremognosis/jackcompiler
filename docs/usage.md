@@ -38,3 +38,7 @@ or in a file
 ```bash
     jack file.jack
 ```
+
+The compiler writes both outputs next to each input file:
+- `File.vm` (VM code)
+- `File.xml` (syntax-tree XML)
